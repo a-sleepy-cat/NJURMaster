@@ -1,3 +1,37 @@
 /*-------------------------------全局定义--------------------------------------*/
-u32 SelfCheckErrorFlag=0x0000;
-u16 SelfCheckValue[SELF_CHECK_ITEM_NUM];
+看门狗:
+  u32 SelfCheckErrorFlag=0x0000;
+  u16 SelfCheckValue[SELF_CHECK_ITEM_NUM];
+  #define SELF_CHECK_ITEM_NUM 11u;
+参数初始化:
+  AllDataUnion__ AllDataUnion;
+
+  typedef union
+  {
+    u8 data[sizeof(AllDataOffset__)];
+    AllDataOffset__ AllData;
+
+  }AllDataUnion__;
+
+  typedef __packed struct
+  {
+    u8 savedflag;
+    IMUSensor_OffSet__ imu_offset;  //IMU 惯性测量单元
+    uint16_t GimbalPitchOffset;     //pitch 俯仰
+    uint16_t GimbalYawOffset;       //yaw  偏航
+    _PID_arg_st PID_ARG[PIDGROUPLEN];
+  }AllDataOffset__;
+
+  typedef __packed struct 
+  {
+    xyz_f_t GYRO_Offset;
+    xyz_f_t ACCER_Offset;
+    xyz_f_t MAG_Offset;
+  }IMUSensor_OffSet__;
+
+  typedef __packed struct 
+  {
+    float x;
+    float y;
+    float z;
+  }xyz_f_t;

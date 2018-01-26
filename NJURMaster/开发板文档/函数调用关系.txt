@@ -3,7 +3,7 @@ int main()
   void AppInit()  //所有非驱动的初始化
     void DogInit(); //看门狗初始化
     void SensorOffsetInit();  //传感器校准值初始化
-      void BSP_FLASH_Read(u32 ReadAddr, u8 *pBuffer, u32 ByteToRead)//从指定地址开始读出指定长度的数据
+      void BSP_FLASH_Read(u32 ReadAddr, u8 *pBuffer, u32 ByteToRead)//从指定地址开始读出指定长度的数据。参数分别为:起始地址，要写入数据储存的首地址，字节数
     void ParametersInit();  //参数初始化
   
   void AllInit()  //底层驱动初始化
