@@ -3,8 +3,10 @@
   u32 SelfCheckErrorFlag=0x0000;
   u16 SelfCheckValue[SELF_CHECK_ITEM_NUM];
   #define SELF_CHECK_ITEM_NUM 11u;
-参数初始化:
+
+传感器校准值初始化:
   AllDataUnion__ AllDataUnion;
+  u8 ParamSavedFlag=0;
 
   typedef union
   {
@@ -35,3 +37,28 @@
     float y;
     float z;
   }xyz_f_t;
+
+  typedef __packed struct
+  {
+    float kp;			 //比例系数
+    float ki;			 //积分系数
+    float kd;		 	 //微分系数
+    float k_pre_d; //previous_d 微分先行
+    float inc_hz;  //不完全微分低通系数
+    float k_inc_d_norm; //Incomplete 不完全微分 归一（0,1）
+    float k_ff;		 //前馈 
+  }_PID_arg_st;
+
+参数初始化：
+  #define PIDGROUPLEN 8
+
+  _PID_arg_st PID_arg[PIDGROUPLEN]={CHASSIS_Rot_PID_OFF,
+																	CHASSIS_Vec_PID_OFF,
+																	GIMBALP_Pos_PID_OFF,
+																	GIMBALP_Vec_PID_OFF,
+																	GIMBALY_Pos_PID_OFF,
+																	GIMBALY_Vec_PID_OFF,
+																	SLIBLIN_Pos_PID_OFF,
+																	SLIBLIN_Vec_PID_OFF};
+
+  _PID_val_st PID_val[PIDGROUPLEN+3];
