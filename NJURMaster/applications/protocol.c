@@ -18,7 +18,7 @@ u8 checkdata_to_send,checksum_to_send,send_check=0;
 u8 send_pid1=0,send_pid2=0,send_pid3=0;
 /**
   * @brief »ù±¾´®¿ÚÍ¨Ñ¶Ğ­Òé½âÎö
-  * @param data_buf	°üºwwwwwwww¬ÍêÕûÒ»Ö¡Êı¾İµÄÊı×éµÄÖ¸Õë
+  * @param data_buf	°üº¬ÍêÕûÒ»Ö¡Êı¾İµÄÊı×éµÄÖ¸Õë
 	* @param _len		Ö¡×Ü³¤
   * @retval None
   * @details ÉÏ²ãÓ²¼ş·¢À´µÄĞÅºÅ»òÊÇµØÃæÕ¾·¢À´µÄĞÅºÅµÄ½âÎöº¯Êı
@@ -173,24 +173,15 @@ if(*(data_buf+2)==0X02)
 #define PITCH_MAX (27.0f)
 #define YAW_MAX   (35.0f)
 #define CHANNELMIDDLE	(1024)
-<<<<<<< HEAD
-#define RC_TOWARD_SCALE (20.0f)
-#define RC_LEFTRIGHT_SCALE (20.0f)
-<<<<<<< HEAD
-=======
-
-#define RC_PITCHSCALE (0.04f)
-#define RC_YAWSCALE (0.013f)
->>>>>>> feature-lfm
-=======
 #define RC_TOWARD_SCALE (30.0f)
 #define RC_LEFTRIGHT_SCALE (30.0f)
 
 #define RC_PITCHSCALE (0.04f)
 #define RC_YAWSCALE (0.003f)
->>>>>>> feature-lfm
 #define MAXTOWARDSPEED (660*RC_TOWARD_SCALE)
 #define MAXLEFTRIGHTSPEED (660*RC_LEFTRIGHT_SCALE)
+u8 WHEEL_STATE = WHEEL_OFF;//Ä¦²ÁÂÖ×´Ì¬
+#define MOUSERESPONCERATE (0.1f) //Êó±êÁéÃô¶È
 
 /**
   * @brief ¶ÔÒ£¿ØÆ÷½âÎö½á¹û½øĞĞ·´Ó¦
@@ -199,27 +190,25 @@ if(*(data_buf+2)==0X02)
   */
 void RcDataAnalysis(RC_Ctrl_t *rc)
 {
+	static u16 cancel_cnt = 0;//Êó±êÄ£Ê½ÏÂÓÒ¼ü¼ÆÊ±³¬¹ı1.5s¹Ø±ÕÄ¦²ÁÂÖ
 	float __temp;
 	if (GetRcMode()==RC_KEY_RCMODE)
 	{
-<<<<<<< HEAD
-		__temp=GimbalPitchPosRef+rc->rc.ch1-CHANNELMIDDLE;
-		GimbalPitchPosRef=LIMIT(__temp,-PITCH_MAX,PITCH_MAX);
-		__temp=GimbalYawPosRef+rc->rc.ch0-CHANNELMIDDLE;
-		GimbalYawPosRef=LIMIT(__temp,-YAW_MAX+Yaw,YAW_MAX+Yaw);
-		
-		ChassisGoToward=(rc->rc.ch3-CHANNELMIDDLE)*RC_TOWARD_SCALE;
-		ChassisGoLeftRight=-(rc->rc.ch2-CHANNELMIDDLE)*RC_LEFTRIGHT_SCALE;
-		
-=======
 		__temp=GimbalPitchPosRef-(rc->rc.ch1-CHANNELMIDDLE)*RC_PITCHSCALE;
 		GimbalPitchPosRef=LIMIT(__temp,PITCH_MIN,PITCH_MAX);
 		__temp=GimbalYawPosRef-(rc->rc.ch0-CHANNELMIDDLE)*RC_YAWSCALE;
 		GimbalYawPosRef=LIMIT(__temp,-YAW_MAX-Yaw,YAW_MAX-Yaw);
 
-		ChassisGoToward=-(rc->rc.ch2-CHANNELMIDDLE)*RC_TOWARD_SCALE;
-		ChassisGoLeftRight=(rc->rc.ch3-CHANNELMIDDLE)*RC_LEFTRIGHT_SCALE;
->>>>>>> feature-lfm
+		ChassisGoToward=(rc->rc.ch3-CHANNELMIDDLE)*RC_TOWARD_SCALE;
+		ChassisGoLeftRight=(rc->rc.ch2-CHANNELMIDDLE)*RC_LEFTRIGHT_SCALE;
+		if(rc->rc.s1 == 3)
+		{
+			WHEEL_STATE = WHEEL_ON;
+		}
+		else
+		{
+			WHEEL_STATE = WHEEL_OFF;
+		}
 	}
 	else if (GetRcMode()==RC_KEY_KEYBOARD)
 	{
@@ -249,11 +238,30 @@ void RcDataAnalysis(RC_Ctrl_t *rc)
 			RampReset(&RcKeyLeftRightRamp);
 			ChassisGoLeftRight = 0;
 		}
+		GimbalYawPosRef = LIMIT(GimbalYawPosRef-(rc->mouse.x)*MOUSERESPONCERATE,-YAW_MAX-Yaw,YAW_MAX-Yaw); 
+		GimbalPitchPosRef = LIMIT(GimbalPitchPosRef-(rc->mouse.y)*MOUSERESPONCERATE,PITCH_MIN,PITCH_MAX);
+		if(rc->mouse.press_r == 1)
+		{
+			cancel_cnt++;
+			if(WHEEL_STATE == WHEEL_OFF&&cancel_cnt==1)
+			{
+				WHEEL_STATE = WHEEL_ON;
+				LASER_ON();
+			}
+			else if(cancel_cnt >= 50)
+			{
+				WHEEL_STATE = WHEEL_OFF;
+				LASER_OFF(); 
+			}
+		}
+		else
+		{
+			cancel_cnt = 0;
+		}
 	}
 	else if (GetRcMode()==RC_KEY_STOP)
 	{
-	
-	
+	   SysMode = SYS_STOPSTATE;	
 	}
 }
 
