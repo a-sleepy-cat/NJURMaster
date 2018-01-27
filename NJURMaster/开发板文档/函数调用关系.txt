@@ -8,17 +8,17 @@ int main()
   
   void AllInit()  //底层驱动初始化
     void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup)//中断分组
-    void TIM6_Configuration(void)；  //TIM6初始化
+    void TIM6_Configuration(void)；  //TIM6初始化，TIM6用于产生1ms中断
       RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6,ENABLE);
       NVIC_Init(&nvic);
       TIM_TimeBaseInit(TIM6,&tim);
-    void TIM5_Configuration(void)  //TIM5初始化
+    void TIM5_Configuration(void)  //TIM5初始化，TIM5用来记录系统运行时间
       RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5,ENABLE);
       TIM_ARRPreloadConfig(TIM5, ENABLE);
       TIM_TimeBaseInit(TIM5, &tim);
       TIM_Cmd(TIM5,ENABLE);  //开始记时
     void InnerLoopInit(void)  //初始化GetInnerLoop功能
-      uint32_t GetInnerLoop(int loop)  //@brief 得到某函数的精准的调用周期@param 计时序号，在头文件中可以查到@retval 执行周期  
+      uint32_t GetInnerLoop(int loop)  //@brief 得到某函数的精准的调用周期@param 计时序号，在头文件中可以查到@retval 执行周期
         Get_Time_Micros();  //TIM5->CNT
     void Led_Configuration(void)  //LED初始化  RED-->PF14  GREEN-->PE7
         RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);

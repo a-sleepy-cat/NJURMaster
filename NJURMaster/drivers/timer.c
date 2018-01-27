@@ -41,7 +41,7 @@ void TIM5_IRQHandler(void)
   * @param None
   * @retval None
   */
-void Delay_us(uint32_t us)										//用TIM2的计数值来做到精确延时
+void Delay_us(uint32_t us)										//用TIM5的计数值来做到精确延时
 {
     uint32_t now = Get_Time_Micros();
     while (Get_Time_Micros() - now < us);
